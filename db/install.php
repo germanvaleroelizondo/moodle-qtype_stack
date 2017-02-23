@@ -49,4 +49,10 @@ function xmldb_qtype_stack_install() {
     }
 
     // TODO: Attempt to create an optimised image at install time.
+    if (PHPUNIT_UTIL || BEHAT_UTIL) {
+        require_once($CFG->dirroot . '/question/type/stack/db/test_maxima_configuration.php');
+        if (qtype_stack_test_config::is_test_config_available()) {
+            qtype_stack_test_config::setup_test_maxima_connection();
+        }
+    }
 }
