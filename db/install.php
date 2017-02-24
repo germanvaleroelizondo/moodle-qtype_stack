@@ -39,20 +39,29 @@ function xmldb_qtype_stack_install() {
     }
     set_config('stackmaximaversion', $matches[1], 'qtype_stack');
 
-    // Make an reasonable guess at the OS. (It defaults to 'unix' in settings.php.
-    $platform = 'unix';
+    // Note we set these next two settings here, rather than rely on a default
+    // in settings.php, so that the guessed values are not overwritten in the
+    // PHPunit/Behat case.
+
+    // Make an reasonable guess at the OS.
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
         // See http://stackoverflow.com/questions/1482260/how-to-get-the-os-on-which-php-is-running
         // and http://stackoverflow.com/questions/738823/possible-values-for-php-os.
         set_config('platform', 'win', 'qtype_stack');
-        $platform = 'win';
+    } else {
+        set_config('platform', 'unix', 'qtype_stack');
     }
 
-    // TODO: Attempt to create an optimised image at install time.
-    if (PHPUNIT_UTIL || BEHAT_UTIL) {
-        require_once($CFG->dirroot . '/question/type/stack/db/test_maxima_configuration.php');
+    // Set this to blank, so it is guessed at runtime.
+    set_config('maximacommand', '', 'qtype_stack');
+
+    // If we are installing for a test, get maxima set up.
+    if (defined('PHPUNIT_UTIL') || defined('BEHAT_UTIL')) {
+        require_once($CFG->dirroot . '/question/type/stack/tests/fixtures/test_maxima_configuration.php');
         if (qtype_stack_test_config::is_test_config_available()) {
             qtype_stack_test_config::setup_test_maxima_connection();
         }
     }
+    print_object(get_config('qtype_stack')); // DONOTOCOMMIT
+    die;
 }

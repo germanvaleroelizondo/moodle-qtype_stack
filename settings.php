@@ -56,8 +56,8 @@ $settings->add(new admin_setting_heading('maixmasettingsheading',
 
 $settings->add(new admin_setting_configselect('qtype_stack/platform',
         get_string('settingplatformtype', 'qtype_stack'),
-        // Note, install.php tries to auto-detect Windows installs, and set the default appropriately.
-        get_string('settingplatformtype_desc', 'qtype_stack'), 'unix', array(
+        // Note, install.php tries to auto-detect Windows installs, and set the default appropriately, hence null here.
+        get_string('settingplatformtype_desc', 'qtype_stack'), null, array(
                 'unix'             => get_string('settingplatformtypeunix',                'qtype_stack'),
                 'unix-optimised'   => get_string('settingplatformtypeunixoptimised',       'qtype_stack'),
                 'win'              => get_string('settingplatformtypewin',                 'qtype_stack'),
@@ -87,9 +87,10 @@ $settings->add(new admin_setting_configselect('qtype_stack/casresultscache',
             'db' => get_string('settingcasresultscache_db', 'qtype_stack'),
         )));
 
+// Note, install.php sets this, hence null here.
 $settings->add(new admin_setting_configtext('qtype_stack/maximacommand',
         get_string('settingplatformmaximacommand', 'qtype_stack'),
-        get_string('settingplatformmaximacommand_desc', 'qtype_stack'), ''));
+        get_string('settingplatformmaximacommand_desc', 'qtype_stack'), null));
 
 $settings->add(new admin_setting_configtext('qtype_stack/serveruserpass',
         get_string('settingserveruserpass', 'qtype_stack'),

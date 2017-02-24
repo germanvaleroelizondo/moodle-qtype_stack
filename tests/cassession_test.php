@@ -72,7 +72,7 @@ class stack_cas_session_test extends qtype_stack_testcase {
 
         $options = new stack_options();
         $options->set_option('simplify', false);
-
+print_object(get_config('qtype_stack')); // DONOTOCOMMIT
         $at1 = new stack_cas_session($s1, $options, 0);
         $this->assertEquals('x^2', $at1->get_display_key('a'));
         $this->assertEquals('\frac{1}{1+x^2}', $at1->get_display_key('b'));

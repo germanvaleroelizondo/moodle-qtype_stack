@@ -66,6 +66,7 @@ abstract class qtype_stack_test_config {
         set_config('casdebugging',    QTYPE_STACK_TEST_CONFIG_CASDEBUGGING,    'qtype_stack');
         set_config('mathsdisplay',    'mathjax',                               'qtype_stack');
         set_config('replacedollars',  0,                                       'qtype_stack');
+        set_config('maximalibraries', 'stats, distrib, descriptive',           'qtype_stack');
         set_config('stackmaximaversion', QTYPE_STACK_EXPECTED_VERSION,         'qtype_stack');
 
         if (QTYPE_STACK_TEST_CONFIG_CASRESULTSCACHE == 'otherdb') {
@@ -83,10 +84,19 @@ abstract class qtype_stack_test_config {
 
         if (defined('QTYPE_STACK_TEST_CONFIG_SERVERUSERPASS')) {
             set_config('serveruserpass',    QTYPE_STACK_TEST_CONFIG_SERVERUSERPASS,    'qtype_stack');
+        } else {
+            set_config('serveruserpass',    '',                                        'qtype_stack');
         }
 
         if (!file_exists(stack_cas_configuration::maximalocal_location())) {
+            print_object('Rebuilding maximalocal.'); // DONOTOCOMMIT
             stack_cas_configuration::create_maximalocal();
+
+            if (QTYPE_STACK_TEST_CONFIG_PLATFORM == 'unix') {
+                print_object('Rebuilding maxima-optimised.'); // DONOTOCOMMIT
+                stack_cas_configuration::create_auto_maxima_image();
+                stack_cas_configuration::test_reset_intance();
+            }
         }
 
         // Create the required directories inside moodledata.
@@ -94,5 +104,16 @@ abstract class qtype_stack_test_config {
         make_upload_directory('stack/logs');
         make_upload_directory('stack/plots');
         make_upload_directory('stack/tmp');
+
+//         // Stop the STACK folder getting reset. We can only do it be forcily
+//         // access a protected property of the test util classes.
+//         foreach (['behat_util', 'phpunit_util'] as $classname) {
+//             if (class_exists($classname)) {
+//                 $class = new ReflectionClass($classname);
+//                 $nonresetproperty = $class->getProperty('datarootskiponreset');
+//                 $nonresetproperty->setAccessible(true);
+//                 $nonresetproperty->setValue(array_merge($nonresetproperty->getValue(), ['stack']));
+//             }
+//         }
     }
 }

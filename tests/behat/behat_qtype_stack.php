@@ -55,7 +55,7 @@ class behat_qtype_stack extends behat_base {
                     ' you must define a Maxima configuration in config.php.');
         }
 
-        qtype_stack_test_config::setup_test_maxima_connection();
+        //qtype_stack_test_config::setup_test_maxima_connection();
     }
 
     /**

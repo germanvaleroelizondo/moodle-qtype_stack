@@ -272,6 +272,11 @@ END;
      */
     public static function maximalocal_location() {
         global $CFG;
+        if (defined('PHPUNIT_UTIL') || defined('PHPUNIT_TEST')) {
+            stack_utils::convert_slash_paths($CFG->dataroot . '/behat/maximalocal.mac'); // This is a place that does not get reset.
+        } else if (defined('BEHAT_UTIL') || defined('BEHAT_TEST')) {
+            stack_utils::convert_slash_paths($CFG->dataroot . '/phpunit/maximalocal.mac'); // This is a place that does not get reset.
+        }
         return stack_utils::convert_slash_paths($CFG->dataroot . '/stack/maximalocal.mac');
     }
 
@@ -363,36 +368,40 @@ END;
             return false;
         }
 
-        /*
-         * Revert to the plain unix platform.  This will genuinely call the CAS, and
-         * as a result create a new image.
-         */
+        // Revert to the plain unix platform.  This will genuinely call the CAS, and
+        // as a result create a new image.
         $oldplatform = $config->platform;
         $oldmaximacommand = $config->maximacommand;
         set_config('platform', 'unix', 'qtype_stack');
         set_config('maximacommand', '', 'qtype_stack');
+        self::test_reset_intance();
 
         // Try to make a new version of the maxima local file.
         self::create_maximalocal();
         // Try to actually connect to Maxima.
         list($message, $genuinedebug, $result) = stack_connection_helper::stackmaxima_genuine_connect();
-
+print_object("Result 1: $result"); // DONOTOCOMMIT
         // Check if the libraries look like they are messing things up.
         if (strpos($genuinedebug, 'eval_string not found') > 0) {
             // If so, get rid of the libraries and try again.
             set_config('maximalibraries', '', 'qtype_stack');
+            self::test_reset_intance();
             list($message, $genuinedebug, $result) = stack_connection_helper::stackmaxima_genuine_connect();
         }
+print_object("Result 2: $result"); // DONOTOCOMMIT
 
         $revert = false;
         if ($result && ($oldplatform == 'unix' || $oldplatform == 'unix-optimised')) {
             // Try to auto make the optimised image.
-            list($message, $genuinedebug, $result, $commandline)
-                 = stack_connection_helper::stackmaxima_auto_maxima_optimise($genuinedebug, true);
+            list($message, $genuinedebug, $result, $commandline) =
+                    stack_connection_helper::stackmaxima_auto_maxima_optimise($genuinedebug, true);
+print_object("Result 3: $result"); // DONOTOCOMMIT
 
             if ($result) {
+                print_object('WORKED'); // DONOTOCOMMIT
                 set_config('platform', 'unix-optimised', 'qtype_stack');
                 set_config('maximacommand', $commandline, 'qtype_stack');
+                self::test_reset_intance();
                 // We need to regenerate this file to supress stackmaxima.mac and libraries being reloaded.
                 self::create_maximalocal();
 
@@ -411,9 +420,19 @@ END;
         }
 
         if ($revert) {
+            print_object('FAILED'); // DONOTOCOMMIT
             set_config('platform', $oldplatform, 'qtype_stack');
             set_config('maximacommand', $oldmaximacommand , 'qtype_stack');
+            self::test_reset_intance();
             self::create_maximalocal();
         }
+    }
+
+    /**
+     * For unit/behat testing use only. Reset the singleton instance.
+     */
+    public static function test_reset_intance() {
+        self::$instance = null;
+        stack_connection_helper::test_reset_config();
     }
 }

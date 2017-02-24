@@ -364,6 +364,11 @@ abstract class stack_connection_helper {
         self::ensure_config_loaded();
 
         $imagename = stack_utils::convert_slash_paths($CFG->dataroot . '/stack/maxima_opt_auto');
+        if (defined('PHPUNIT_UTIL')) {
+            $imagename = $CFG->dataroot . '/behat/maxima_opt_auto'; // This is a place that does not get reset.
+        } else if (defined('BEHAT_UTIL')) {
+            $imagename = $CFG->dataroot . '/phpunit/maxima_opt_auto'; // This is a place that does not get reset.
+        }
 
         $lisp = '1';
         // Try to guess the lisp version.
@@ -411,11 +416,11 @@ abstract class stack_connection_helper {
 
         // Really make sure there is no cache.
         list($results, $debug) = self::stackmaxima_nocache_call($maximacommand);
-
+echo($debug); // DONOTOCOMMIT
         // Question: should we at this stage try to use the optimised image we have created?
         $success = true;
         // Add the timeout command to the message.
-        $commandline = 'timeout --kill-after=10s 10s '.$commandline;
+        $commandline = 'timeout --kill-after=60s 60s '.$commandline;
         $message = stack_string('healthautomaxopt_ok', array('command' => $commandline));
         if (!file_exists($imagename)) {
             $success = false;
@@ -425,4 +430,10 @@ abstract class stack_connection_helper {
         return array($message, $debug, $success, $commandline);
     }
 
+    /**
+     * For unit/behat testing use only. Reset the cached config.
+     */
+    public static function test_reset_config() {
+        self::$config = null;
+    }
 }
