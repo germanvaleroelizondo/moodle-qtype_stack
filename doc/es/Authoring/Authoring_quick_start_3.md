@@ -1,26 +1,26 @@
-# Authoring quick start 3: turning simplification off
+# Guía rápida de autoría 3: desactivando la simplificación
 
-This is the third part of the [authoring quick start](Authoring_quick_start.md).  It assumes you have already worked through [authoring quick start 1](Authoring_quick_start.md) and [authoring quick start 2](Authoring_quick_start_2.md). The purpose is to discuss some common issues which arise when authoring particularly elementary questions where the CAS might do too much.
+Esta es la tercera parte de la [guía rápida de autoría](Authoring_quick_start.md).  Asume que Usted ya ha trabajado la [guía rápida de autoría 1](Authoring_quick_start.md) y la [guía rápida de autoría 2](Authoring_quick_start_2.md). Su propósito es discutir algunos problemas comunes que surgen al escribir preguntas particularmente elementales donde el CAS podría hacer demasiado.
 
-### Example question ###
+### Pregunta de ejemplo ###
 
-Given a complex number \(z=ae^{ib}\) determine \(|z^{n}|\) and \(\arg(z^{n})\).
+Dado un número complejo \(z=ae^{ib}\) determine \(|z^{n}|\) y \(\arg(z^{n})\).
 
-Where \(a\), \(b\) and \(n\) are randomly generated numbers.
+Donde \(a\), \(b\) y \(n\) son números generados aleatoriamente.
 
-## Simplification off ##
+## Simplificación desactivada ##
 
-It is tempting when writing questions such as this to operate at the _level of display._  We could randomly generate \(a\), \(b\) and \(n\) and insert them into the question text.  For example:
+Es tentador cuando se escriben preguntas como esta el operar al  _nivel de visualización._  Nosotros podríamos generar aleatoriamente \(a\), \(b\) y \(n\) y podríamos insertarlos dentro del texto de la pregunta. Por ejemplo:
 
      \(\right({@a@}e^{{@b@} i}\left)^{@n@}\)
 
-What we are doing here is to treat every variable separately, not to create a single CAS object for the complex number.  This is ok, but causes problems and is difficult to read because it mixes CAS and LaTeX.
+Lo que estamos haciendo aquí es tratar a todas las variables separadamente, no estamos creando un único objeto CAS para el número complejo. Esto está bien, pero causa problemas y es dificil de leer porque mezcla CAS y LaTeX.
 
-The alternative is to switch simplification off and use the CAS to represent expressions more directly.  The following is a single Maxima expression.
+La alternativa es desactivar la simplificación y usar el CAS para representar expresiones más directamente. El siguiente es una única expresión Maxima.
 
      {@(a*%e^(b*%i))^n@}
 
-Of course, we don't want Maxima to _actually calculate the power_ just to _represent it!_  To see the difference, you can copy the following into a Maxima desktop session.
+Desde luego, nosotros no queremos que Maxima _realmente calcule la potencia_ simplemente que  _la represente!_  Para ver la diferencia, Usted puede copiar lo siguiente dentro de una sesión de escritorio de Maxima.
 
     kill(all);
     simp:true;
@@ -28,13 +28,13 @@ Of course, we don't want Maxima to _actually calculate the power_ just to _repre
     simp:false;
     (3*%e^(%i*%pi/2))^4;
 
-Solving problems at the level of the CAS, not at the level of the display, is often better.    To tell STACK to set `simp:false` throughout the question scroll towards the bottom of the form and under `Options` set `Question-level simplify` to be `No`.
+El resolver problemas al nivel del CAS, no al nivel de la visualización, es a menudo mejor.    Decirle a STACK que configure `simp:false` en la pregunta, deslícese hacia el fondo del formato y debajo de `Opciones` configure `Simplificar a nivel-de-pregunta` para que sea `No`.
 
-This does have some drawbacks.  Having switched off all simplification, we now need to turn it back on selectively! To do this, we use Maxima commands such as the following.
+Esto tiene algunos inconvenientes.  Al haber desactivado la simplificación, ¡ahora nosotros necesitamos volver a activarla selectivamente! Para hacer esto, nosotros usamos comandos de Maxima como el siguiente.
 
     a : ev(2+rand(15),simp);
 
-In particular, we are going to define the question variables as follows.
+En particular, nosotros vamos a definir las variables de lapregunta como sigue.
 
     a : ev(2+rand(15),simp);
     b : ev((-1)^rand(2)*((1+rand(10)))/(2+rand(15)),simp);
@@ -42,7 +42,7 @@ In particular, we are going to define the question variables as follows.
     q : a*%e^(b*%i*%pi);
     p : ev(mod(b*n,2),simp);
 
-A useful alternative when many consecutive expressions need to be simplified is to use the following.
+Una alternativa útil cuando necesitan ser simplificadas muchas expresiones consecutivas es usar lo siguiente.
 
     simp : true;
     a : 2+rand(15);
